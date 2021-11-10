@@ -7,3 +7,8 @@ ginza
 ja-ginza
 xfeat
 optuna
+emoji
+mojimoji
+neologdn
+fugashi
+ipadic

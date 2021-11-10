@@ -48,7 +48,7 @@ for fold in range(NUM_SPLIT):
         input_val,
         target_train,
         target_val,
-    ) = fold_generator.get_fold(data=data_df, fold=fold)
+    ) = fold_generator.get_fold(data=data_df, fold=fold, random_state = 42)
     print(f"fold {fold}")
     train_dataset = BERTSimpleDataset(
         input_texts=input_train["title"], target=target_train, category=input_train["biggenre"]

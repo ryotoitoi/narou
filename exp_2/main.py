@@ -11,7 +11,7 @@ df_test = pd.read_csv('./data/test.csv')
 sub_df = pd.read_csv('./data/sample_submission.csv')
 
 df_train = df_train.select_dtypes("int")
-df_test = df_train.select_dtypes("int")
+df_test = df_test.select_dtypes("int")
 
 train_x = df_train.drop(columns="fav_novel_cnt_bin")
 train_y = df_train[["fav_novel_cnt_bin"]]

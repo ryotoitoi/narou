@@ -1,3 +1,4 @@
 wtfml/
 .DS_Store/
 outputs/
+wandb/

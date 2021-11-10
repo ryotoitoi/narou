@@ -19,9 +19,9 @@ from xfeat import Pipeline, SelectCategorical, LabelEncoder
 ### ファイル読み込み・データ確認
 
 
-train_df = pd.read_csv('train.csv')
-test_df = pd.read_csv('test.csv')
-sub_df = pd.read_csv('sample_submission.csv')
+train_df = pd.read_csv('data/train.csv')
+test_df = pd.read_csv('data/test.csv')
+sub_df = pd.read_csv('data/sample_submission.csv')
 
 raw_df = pd.concat([train_df, test_df])
 train_idx = train_df.shape[0] # 何行目までが学習データか、後ほど使う

@@ -1,0 +1,23 @@
+wandb:
+  project: medical_treatise
+  exp_num: 1
+  tags: [bert]
+path:
+  data_file_path: data/train.csv
+  checkpoint_path: checkpoints
+model:
+  d_model: 768
+  n_classes: 1
+  max_length: 512
+  pretrained_model_name: allenai/scibert_scivocab_uncased
+training:
+  num_split: 3
+  test_size: 0.3
+  n_epochs: 10
+  batch_size: 16 
+  learning_rate: 1e-5 # TODO
+  text_column_name: article # TODO
+  label_column_name: label # TODO
+callbacks:
+  patience: 3
+  patience_min_delta: 0

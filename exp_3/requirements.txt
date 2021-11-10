@@ -1,0 +1,16 @@
+transformers
+pytorch_lightning
+wandb
+sklearn
+transformers
+ginza 
+ja-ginza
+xfeat
+optuna
+emoji
+mojimoji
+neologdn
+fugashi
+ipadic
+lightgbm
+spacy

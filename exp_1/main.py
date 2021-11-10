@@ -52,10 +52,10 @@ for fold in range(NUM_SPLIT):
     ) = fold_generator.get_fold(data=data_df, fold=fold)
     print(f"fold {fold}")
     train_dataset = BERTSimpleDataset(
-        input_texts=input_train.reindex()["title"], target=target_train.reindex(), category=input_train.reindex()["biggenre"]
+        input_texts=input_train["title"], target=target_train, category=input_train["biggenre"]
     )
     val_dataset = BERTSimpleDataset(
-        input_texts=input_val.reindex()["title"], target=target_val.reindex(), category=input_val.reindex()["biggenre"]
+        input_texts=input_val["title"], target=target_val, category=input_val["biggenre"]
     )
 
     data_module = plDataModule(
@@ -97,12 +97,13 @@ for fold in range(NUM_SPLIT):
     )
     
     trainer = pl.Trainer(
-        gpus = 0,
+        gpus = 1,
         max_epochs=MAX_EPOCH,
         gradient_clip_val=0.5,
         logger=[tb_logger,wandb_logger], 
         callbacks=[callbacks_loss, early_stopping],
     )
+
     trainer.fit(pl_engine, datamodule=data_module)
 
     # memory leakingの対策

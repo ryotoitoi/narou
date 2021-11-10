@@ -3,7 +3,7 @@ import numpy as np
 import re
 from glob import glob
 from tqdm import tqdm
-import lightgbm as lgb
+import optuna.integration.lightgbm as lgb
 from sklearn.model_selection import train_test_split
 from wandb.lightgbm import wandb_callback
 import wandb
@@ -34,20 +34,6 @@ params = {
     'objective': 'multiclass',
     'num_classes': 5,
     'metric': 'multi_logloss',
-    'num_leaves': 42,
-    'max_depth': 7,
-    "feature_fraction": 0.8,
-    'subsample_freq': 1,
-    "bagging_fraction": 0.95,
-    'min_data_in_leaf': 2,
-    'learning_rate': 0.1,
-    "boosting": "gbdt",
-    "lambda_l1": 0.1,
-    "lambda_l2": 10,
-    "verbosity": -1,
-    "random_state": 42,
-    "num_boost_round": 50000,
-    "early_stopping_rounds": 100
 }
 
 
@@ -55,7 +41,7 @@ train_data = lgb.Dataset(train_x, label=train_y)
 val_data = lgb.Dataset(val_x, label=val_y)
 
 cat_cols = ['userid', 'biggenre', 'genre', 'novel_type', 'end', 'isstop', 'isr15', 'isbl', 'isgl', 'iszankoku', 'istensei', 'istenni', 'pc_or_k']
-
+best_params, tuning_history = dict(), list()
 model = lgb.train(
     params,
     train_data, 
@@ -63,9 +49,17 @@ model = lgb.train(
     valid_names = ['train', 'valid'],
     valid_sets =[train_data, val_data], 
     verbose_eval = 100,
-    callbacks=[wandb_callback()]
+    callbacks=[wandb_callback()], 
 )
-
+model = lgb.train(
+    model.params,
+    train_data, 
+    categorical_feature = cat_cols,
+    valid_names = ['train', 'valid'],
+    valid_sets =[train_data, val_data], 
+    verbose_eval = 100,
+    callbacks=[wandb_callback()], 
+)
 val_pred = model.predict(val_x, num_iteration=model.best_iteration)
 
 pred_df = pd.DataFrame(sorted(zip(val_x.index, val_pred, val_y)), columns=['index', 'predict', 'actual'])

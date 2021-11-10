@@ -28,7 +28,6 @@ bs4 = "^0.0.1"
 fugashi = "^1.1.1"
 ipadic = "^1.0.0"
 nest-asyncio = "^1.5.1"
-twint = {git = "https://github.com/twintproject/twint.git", rev = "origin/master"}
 mlflow = "^1.19.0"
 onnx = "^1.10.1"
 onnxruntime = "^1.8.1"

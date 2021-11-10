@@ -46,6 +46,7 @@ gcsfs = "^2021.10.1"
 plotly = "^5.3.1"
 lightgbm = "^3.3.1"
 sklearn = "^0.0"
+wandb = "^0.12.6"
 
 [tool.poetry.dev-dependencies]
 pysen = {version = "0.9.1", extras = ["lint"]}

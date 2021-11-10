@@ -5,6 +5,8 @@ from glob import glob
 from tqdm import tqdm
 import lightgbm as lgb
 from sklearn.model_selection import train_test_split
+from wandb.lightgbm import wandb_callback
+from utils.cross_validation import FoldGenerator
 
 df_train = pd.read_csv('./data/train.csv')
 df_test = pd.read_csv('./data/test.csv')
@@ -57,6 +59,7 @@ model = lgb.train(
     valid_names = ['train', 'valid'],
     valid_sets =[train_data, val_data], 
     verbose_eval = 100,
+    callbacks=[wandb_callback()]
 )
 
 val_pred = model.predict(val_x, num_iteration=model.best_iteration)

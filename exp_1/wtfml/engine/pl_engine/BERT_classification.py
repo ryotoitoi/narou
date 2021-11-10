@@ -1,3 +1,7 @@
+"""
+__author__: Abhishek Thakur
+"""
+
 from typing import Optional
 
 import pytorch_lightning as pl
@@ -11,18 +15,16 @@ from wtfml.engine.nlp.model import BERTBaseClassifier
 
 
 class BERTClassificationPlEngine(pl.LightningModule):
-    
     def __init__(
         self,
-        model = BERTBaseClassifier(num_classes = 1),
-        loss_fn = nn.BCEWithLogitsLoss(),
-        train_acc = torchmetrics.Accuracy(),
-        valid_acc = torchmetrics.Accuracy(),
+        model=BERTBaseClassifier(num_classes=1),
+        loss_fn=nn.BCEWithLogitsLoss(),
+        train_acc=torchmetrics.Accuracy(),
+        valid_acc=torchmetrics.Accuracy(),
         lr: float = 3e-5,
-        max_epoch = 10,
+        max_epoch=10,
     ):
         super(BERTClassificationPlEngine, self).__init__()
-
         self.model = model
         self.scaler = None
         self.loss_function = loss_fn
@@ -43,11 +45,11 @@ class BERTClassificationPlEngine(pl.LightningModule):
             batch["token_type_ids"],
             batch["targets"],
         )
-        
+        # target = main_target + sub_target * self.sub_adjustment
         pred_batch_train = self.forward(ids, mask, token_type_ids)
-        train_loss = self.loss_function(pred_batch_train.float(), target.float())
+        train_loss = self.loss_function(pred_batch_train, target)
         pred_batch_train_for_metrics = torch.sigmoid(pred_batch_train)
-        target = target.to(torch.long)
+        target = target.to(torch.int)
         self.train_acc(pred_batch_train_for_metrics, target)
         self.log(
             "train_acc",
@@ -76,11 +78,11 @@ class BERTClassificationPlEngine(pl.LightningModule):
             batch["token_type_ids"],
             batch["targets"],
         )
-
+        # target = main_target + sub_target * self.sub_adjustment
         out = self.forward(ids, mask, token_type_ids)
-        loss = self.loss_function(out.float(), target.float())
+        loss = self.loss_function(out, target)
         out_for_metrics = torch.sigmoid(out)
-        target = target.to(torch.long)
+        target = target.to(torch.int)
         self.valid_acc(out_for_metrics, target)
 
         self.log(
@@ -89,7 +91,7 @@ class BERTClassificationPlEngine(pl.LightningModule):
             prog_bar=True,
             logger=True,
             on_epoch=True,
-            on_step=True,
+            on_step=False,
         )
         self.log(
             "valid_loss",
@@ -97,10 +99,11 @@ class BERTClassificationPlEngine(pl.LightningModule):
             prog_bar=True,
             logger=True,
             on_epoch=True,
-            on_step=True,
+            on_step=False,
         )
         return {
             "val_loss": loss,
+            # "acc": acc,
         }
 
     def configure_optimizers(self):
@@ -126,7 +129,6 @@ class BERTClassificationPlEngine(pl.LightningModule):
 
         # opt = optim.AdamW(self.model.parameters(), lr=self.lr)
         sch = get_linear_schedule_with_warmup(
-            opt, num_warmup_steps=1, 
-            num_training_steps=self.max_epoch
+            opt, num_warmup_steps=0, num_training_steps=self.max_epoch
         )
         return [opt], [sch]

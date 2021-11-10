@@ -1,6 +1,7 @@
 import pytorch_lightning as pl
 from torch.utils.data import DataLoader
 
+
 class plDataModule(pl.LightningDataModule):
     def __init__(
         self,
@@ -10,15 +11,34 @@ class plDataModule(pl.LightningDataModule):
         num_workers=2,
         train_sampler=None,
         train_shuffle=True,
-        train_batch_size=8,
+        train_batch_size=64,
         train_drop_last=False,
-        val_batch_size=8,
+        val_batch_size=16,
         val_shuffle=False,
         val_sampler=None,
         train_dataloader=None,
         val_dataloader=None,
         test_dataloader=None,
     ):
+        """
+        DataSetやSamplerの定義を行う。
+
+        Args:
+            train_dataset ([type]):
+            val_dataset ([type]):
+            test_dataset ([type], optional): . Defaults to None.
+            num_workers (int, optional): . Defaults to 2.
+            train_sampler ([type], optional): . Defaults to None.
+            train_shuffle (bool, optional): . Defaults to True.
+            train_batch_size (int, optional): . Defaults to 64.
+            train_drop_last (bool, optional): . Defaults to False.
+            val_batch_size (int, optional): . Defaults to 16.
+            val_shuffle (bool, optional): . Defaults to False.
+            val_sampler ([type], optional): . Defaults to None.
+            train_dataloader ([type], optional): . Defaults to None.
+            val_dataloader ([type], optional): . Defaults to None.
+            test_dataloader ([type], optional): . Defaults to None.
+        """
         super().__init__()
         self.train_dataset = train_dataset
         self.val_dataset = val_dataset
@@ -38,7 +58,6 @@ class plDataModule(pl.LightningDataModule):
         self.created_val_dataloader = val_dataloader
         self.created_test_dataloader = test_dataloader
 
-    # trainデータでのデータローダー
     def train_dataloader(self):
         if self.created_train_dataloader:
             return self.created_train_dataloader

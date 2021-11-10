@@ -1,0 +1,1 @@
+{"train_multi_logloss": 0.8320297500812543, "valid_multi_logloss": 0.8978017723523578, "_runtime": 18, "_timestamp": 1636521879, "_step": 237, "_wandb": {"runtime": 48}}

@@ -1,0 +1,129 @@
+2021-11-10 05:24:21,653 INFO    MainThread:1747 [wandb_setup.py:_flush():71] setting env: {}
+2021-11-10 05:24:21,653 INFO    MainThread:1747 [wandb_setup.py:_flush():71] setting login settings: {}
+2021-11-10 05:24:21,653 INFO    MainThread:1747 [wandb_setup.py:_flush():71] setting login settings: {'api_key': 'f6355e7a425f9d48bfef06c7011ba25f0642b86b'}
+2021-11-10 05:24:21,653 INFO    MainThread:1747 [wandb_init.py:_log_setup():357] Logging user logs to /content/narou/wandb/run-20211110_052421-nleguel4/logs/debug.log
+2021-11-10 05:24:21,653 INFO    MainThread:1747 [wandb_init.py:_log_setup():358] Logging internal logs to /content/narou/wandb/run-20211110_052421-nleguel4/logs/debug-internal.log
+2021-11-10 05:24:21,653 INFO    MainThread:1747 [wandb_init.py:init():390] calling init triggers
+2021-11-10 05:24:21,653 INFO    MainThread:1747 [wandb_init.py:init():397] wandb.init called with sweep_config: {}
+config: {}
+2021-11-10 05:24:21,653 INFO    MainThread:1747 [wandb_init.py:init():435] starting backend
+2021-11-10 05:24:21,653 INFO    MainThread:1747 [backend.py:_multiprocessing_setup():97] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2021-11-10 05:24:21,662 INFO    MainThread:1747 [backend.py:ensure_launched():199] starting backend process...
+2021-11-10 05:24:21,669 INFO    MainThread:1747 [backend.py:ensure_launched():205] started backend process with pid: 1762
+2021-11-10 05:24:21,674 INFO    MainThread:1747 [wandb_init.py:init():444] backend started and connected
+2021-11-10 05:24:21,676 INFO    MainThread:1747 [wandb_init.py:init():503] updated telemetry
+2021-11-10 05:24:21,726 INFO    MainThread:1747 [wandb_init.py:init():533] communicating current version
+2021-11-10 05:24:22,760 INFO    MainThread:1747 [wandb_init.py:init():538] got version response 
+2021-11-10 05:24:22,761 INFO    MainThread:1747 [wandb_init.py:init():548] communicating run to backend with 30 second timeout
+2021-11-10 05:24:22,996 INFO    MainThread:1747 [wandb_init.py:init():576] starting run threads in backend
+2021-11-10 05:24:25,844 INFO    MainThread:1747 [wandb_run.py:_console_start():1693] atexit reg
+2021-11-10 05:24:25,845 INFO    MainThread:1747 [wandb_run.py:_redirect():1567] redirect: SettingsConsole.REDIRECT
+2021-11-10 05:24:25,845 INFO    MainThread:1747 [wandb_run.py:_redirect():1572] Redirecting console.
+2021-11-10 05:24:25,858 INFO    MainThread:1747 [wandb_run.py:_redirect():1628] Redirects installed.
+2021-11-10 05:24:25,858 INFO    MainThread:1747 [wandb_init.py:init():603] run started, returning control to user process
+2021-11-10 05:25:08,848 INFO    MainThread:1747 [wandb_run.py:_atexit_cleanup():1663] got exitcode: 0
+2021-11-10 05:25:08,849 INFO    MainThread:1747 [wandb_run.py:_restore():1635] restore
+2021-11-10 05:25:11,794 INFO    MainThread:1747 [wandb_run.py:_wait_for_finish():1793] got exit ret: file_counts {
+  wandb_count: 1
+}
+pusher_stats {
+  uploaded_bytes: 637
+  total_bytes: 637
+}
+
+2021-11-10 05:25:12,068 INFO    MainThread:1747 [wandb_run.py:_wait_for_finish():1793] got exit ret: file_counts {
+  wandb_count: 1
+}
+pusher_stats {
+  uploaded_bytes: 637
+  total_bytes: 637
+}
+
+2021-11-10 05:25:12,170 INFO    MainThread:1747 [wandb_run.py:_wait_for_finish():1793] got exit ret: file_counts {
+  wandb_count: 5
+}
+pusher_stats {
+  uploaded_bytes: 637
+  total_bytes: 9933
+}
+
+2021-11-10 05:25:12,273 INFO    MainThread:1747 [wandb_run.py:_wait_for_finish():1793] got exit ret: file_counts {
+  wandb_count: 5
+}
+pusher_stats {
+  uploaded_bytes: 637
+  total_bytes: 9933
+}
+
+2021-11-10 05:25:12,375 INFO    MainThread:1747 [wandb_run.py:_wait_for_finish():1793] got exit ret: file_counts {
+  wandb_count: 5
+}
+pusher_stats {
+  uploaded_bytes: 9933
+  total_bytes: 9933
+}
+
+2021-11-10 05:25:12,477 INFO    MainThread:1747 [wandb_run.py:_wait_for_finish():1793] got exit ret: file_counts {
+  wandb_count: 5
+}
+pusher_stats {
+  uploaded_bytes: 9933
+  total_bytes: 9933
+}
+
+2021-11-10 05:25:12,580 INFO    MainThread:1747 [wandb_run.py:_wait_for_finish():1793] got exit ret: file_counts {
+  wandb_count: 5
+}
+pusher_stats {
+  uploaded_bytes: 9933
+  total_bytes: 9933
+}
+
+2021-11-10 05:25:12,682 INFO    MainThread:1747 [wandb_run.py:_wait_for_finish():1793] got exit ret: file_counts {
+  wandb_count: 5
+}
+pusher_stats {
+  uploaded_bytes: 9933
+  total_bytes: 9933
+}
+
+2021-11-10 05:25:12,784 INFO    MainThread:1747 [wandb_run.py:_wait_for_finish():1793] got exit ret: file_counts {
+  wandb_count: 5
+}
+pusher_stats {
+  uploaded_bytes: 9933
+  total_bytes: 9933
+}
+
+2021-11-10 05:25:12,886 INFO    MainThread:1747 [wandb_run.py:_wait_for_finish():1793] got exit ret: file_counts {
+  wandb_count: 5
+}
+pusher_stats {
+  uploaded_bytes: 9933
+  total_bytes: 9933
+}
+
+2021-11-10 05:25:13,297 INFO    MainThread:1747 [wandb_run.py:_wait_for_finish():1793] got exit ret: file_counts {
+  wandb_count: 5
+}
+pusher_stats {
+  uploaded_bytes: 9933
+  total_bytes: 9933
+}
+
+2021-11-10 05:25:13,787 INFO    MainThread:1747 [wandb_run.py:_wait_for_finish():1793] got exit ret: done: true
+exit_result {
+}
+file_counts {
+  wandb_count: 5
+}
+pusher_stats {
+  uploaded_bytes: 9933
+  total_bytes: 9933
+}
+local_info {
+}
+
+2021-11-10 05:25:15,500 INFO    MainThread:1747 [wandb_run.py:_append_history():2011] rendering history
+2021-11-10 05:25:15,501 INFO    MainThread:1747 [wandb_run.py:_append_summary():1966] rendering summary
+2021-11-10 05:25:15,501 INFO    MainThread:1747 [wandb_run.py:_append_files():2061] logging synced files

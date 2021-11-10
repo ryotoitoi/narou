@@ -67,4 +67,4 @@ feature_imp = pd.DataFrame(sorted(zip(model.feature_importance(), train_x.column
 
 test_pred = model.predict(df_test, num_iteration=model.best_iteration)
 sub_df.iloc[:, 1:] = test_pred
-sub_df.to_csv('../output/test_submission.csv', index=False)
+sub_df.to_csv('./output/test_submission.csv', index=False)

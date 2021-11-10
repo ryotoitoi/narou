@@ -3,3 +3,7 @@ pytorch_lightning
 wandb
 sklearn
 transformers
+ginza 
+ja-ginza
+xfeat
+optuna

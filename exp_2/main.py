@@ -61,7 +61,7 @@ model = lgb.train(
     valid_sets =[train_data, val_data], 
     verbose_eval = 100,
     study=study_tuner,
-    early_stopping_rounds=250,
+    early_stopping_rounds=50,
     callbacks=[wandb_callback()], 
 )
 val_pred = model.predict(val_x, num_iteration=model.best_iteration)

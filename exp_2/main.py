@@ -6,7 +6,11 @@ from tqdm import tqdm
 import lightgbm as lgb
 from sklearn.model_selection import train_test_split
 from wandb.lightgbm import wandb_callback
+import wandb
 from utils.cross_validation import FoldGenerator
+
+
+wandb.init(project="narou", entity="ryotoitoi")
 
 df_train = pd.read_csv('./data/train.csv')
 df_test = pd.read_csv('./data/test.csv')

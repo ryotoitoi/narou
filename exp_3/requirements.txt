@@ -14,3 +14,4 @@ fugashi
 ipadic
 lightgbm
 spacy
+umap-learn

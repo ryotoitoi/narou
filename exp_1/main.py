@@ -28,11 +28,10 @@ train_data_path = "data/train.csv"
 
 
 data_df = pd.read_csv(train_data_path).dropna(subset=["title"]).reset_index()
-target = data_df["fav_novel_cnt_bin"]
-input_data = data_df["title"]
 
-
-input_train , input_val = train_test_split(data_df, test_size=0.2,shuffle=True) 
+input_train , input_val = train_test_split(data_df, test_size=0.2, shuffle=True)
+input_train = input_train.reset_index()
+input_val = input_val.reset_index()
 target_train = input_train["fav_novel_cnt_bin"]
 target_val = input_val["fav_novel_cnt_bin"]
 

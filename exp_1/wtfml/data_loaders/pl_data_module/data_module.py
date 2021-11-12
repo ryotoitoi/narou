@@ -20,25 +20,6 @@ class plDataModule(pl.LightningDataModule):
         val_dataloader=None,
         test_dataloader=None,
     ):
-        """
-        DataSetやSamplerの定義を行う。
-
-        Args:
-            train_dataset ([type]):
-            val_dataset ([type]):
-            test_dataset ([type], optional): . Defaults to None.
-            num_workers (int, optional): . Defaults to 2.
-            train_sampler ([type], optional): . Defaults to None.
-            train_shuffle (bool, optional): . Defaults to True.
-            train_batch_size (int, optional): . Defaults to 64.
-            train_drop_last (bool, optional): . Defaults to False.
-            val_batch_size (int, optional): . Defaults to 16.
-            val_shuffle (bool, optional): . Defaults to False.
-            val_sampler ([type], optional): . Defaults to None.
-            train_dataloader ([type], optional): . Defaults to None.
-            val_dataloader ([type], optional): . Defaults to None.
-            test_dataloader ([type], optional): . Defaults to None.
-        """
         super().__init__()
         self.train_dataset = train_dataset
         self.val_dataset = val_dataset

@@ -17,8 +17,10 @@ from wtfml.engine.nlp.model import BERTBaseClassifier
 class BERTClassificationPlEngine(pl.LightningModule):
     def __init__(
         self,
-        model=BERTBaseClassifier(num_classes=1),
-        loss_fn=nn.BCEWithLogitsLoss(),
+        model=BERTBaseClassifier(num_classes=4),
+ 
+        # loss_fn=nn.BCEWithLogitsLoss(),
+        loss_fn = nn.CrossEntropyLoss(),
         train_acc=torchmetrics.Accuracy(),
         valid_acc=torchmetrics.Accuracy(),
         lr: float = 3e-5,
@@ -48,8 +50,8 @@ class BERTClassificationPlEngine(pl.LightningModule):
         # target = main_target + sub_target * self.sub_adjustment
         pred_batch_train = self.forward(ids, mask, token_type_ids)
         train_loss = self.loss_function(pred_batch_train, target)
-        pred_batch_train_for_metrics = torch.sigmoid(pred_batch_train)
-        target = target.to(torch.int)
+        pred_batch_train_for_metrics = torch.softmax(pred_batch_train,dim = 1)
+        target = target.to(torch.long)
         self.train_acc(pred_batch_train_for_metrics, target)
         self.log(
             "train_acc",
@@ -80,9 +82,11 @@ class BERTClassificationPlEngine(pl.LightningModule):
         )
         # target = main_target + sub_target * self.sub_adjustment
         out = self.forward(ids, mask, token_type_ids)
+        # print(out, target)
         loss = self.loss_function(out, target)
-        out_for_metrics = torch.sigmoid(out)
-        target = target.to(torch.int)
+        out_for_metrics = torch.softmax(out,dim = 1) 
+
+        target = target.to(torch.long)
         self.valid_acc(out_for_metrics, target)
 
         self.log(
@@ -129,6 +133,6 @@ class BERTClassificationPlEngine(pl.LightningModule):
 
         # opt = optim.AdamW(self.model.parameters(), lr=self.lr)
         sch = get_linear_schedule_with_warmup(
-            opt, num_warmup_steps=0, num_training_steps=self.max_epoch
+            opt, num_warmup_steps=3, num_training_steps=self.max_epoch
         )
         return [opt], [sch]

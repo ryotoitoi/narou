@@ -1,6 +1,4 @@
-#%%
-
-from typing import Optional
+import sys
 
 import torch
 import torch.nn as nn
@@ -8,6 +6,15 @@ import torch.nn.functional as F
 import torchvision
 from efficientnet_pytorch import EfficientNet
 from matplotlib import pyplot as plt
+
+sys_paths = [
+    "/home/yongtae/Lung_project/bonoo_jf_lung",
+    "/Users/yongtae/Documents/bonbon/bonoo_jf_lung",
+]
+
+for sys_path in sys_paths:
+    if sys_path not in sys.path:
+        sys.path.append(sys_path)
 
 
 def conv3x3(in_planes, out_planes, stride=1):
@@ -107,7 +114,7 @@ class SimpleAttentionResnetNetwork(nn.Module):
             block, 2048, n, stride=1, down_size=False
         )
         self.attn_conv = nn.Sequential(nn.Conv2d(2048, 1, 1), nn.Sigmoid())
-        self.fc = nn.Linear(2048 + 768, num_classes)
+        self.fc = nn.Linear(2048, num_classes)
         self.mask_ = None
 
     def _make_layer(self, block, planes, blocks, stride=1, down_size=True):
@@ -161,28 +168,8 @@ class SimpleAttentionResnetNetwork(nn.Module):
         return self.mask_, prediction
 
 
-#%%
 class SimpleAttentionEfficientNetwork(nn.Module):
-    def __init__(
-        self,
-        num_classes: int = 768,
-        base_model_path: Optional[str] = None,
-        pre_trained: bool = True,
-        transfer_learning: bool = False,
-        model_name_num: int = 1,
-        image_size: int = 224,
-    ):
-        """
-        Efficient-NetにAttention mechanismを追加したモデル
-
-        Args:
-            num_classes (int, optional): 予想するクラスの数. Defaults to 768.
-            base_model_path ([type], optional): loadしたいモデルのpath. Defaults to None.
-            pre_trained (bool, optional): 事前学習済みモデルを利用するのか. Defaults to True.
-            transfer_learning (bool, optional): 転移学習をするのか. Defaults to False.
-            model_name_num (int, optional): effientnet-b{ここの数}. Defaults to 1.
-            image_size (int, optional): input_imageのサイズ. Defaults to 224.
-        """
+    def __init__(self, num_classes, base_model_path=None, pre_trained: bool = True):
         super().__init__()
         depth = 50
         n = 2
@@ -194,34 +181,20 @@ class SimpleAttentionEfficientNetwork(nn.Module):
             self.base_model = torch.load(base_model_path, map_location="cpu")
         else:
             if pre_trained:
-                self.base_model = EfficientNet.from_pretrained(
-                    "efficientnet-b{}".format(model_name_num)
-                )
+                self.base_model = EfficientNet.from_pretrained("efficientnet-b4")
             else:
-                self.base_model = EfficientNet.from_name(
-                    "efficientnet-b{}".format(model_name_num)
-                )
-        if transfer_learning:
-            for param in self.base_model.parameters():
-                param.requires_grad = False
-        dummy_data = torch.ones(
-            (1, 3, image_size, image_size)
-        )  # TODO ここのサイズはsettingみたいなので、行えるようにしたい
-        data = self.base_model.extract_features(dummy_data)
-        self.feature_number = data.shape[1]
+                self.base_model = EfficientNet.from_name("efficientnet-b4")
         self.attn_resnet_block = self._make_layer(
-            block, self.feature_number, n, stride=1, down_size=False
+            block, 2048, n, stride=1, down_size=False
         )
-        self.attn_conv = nn.Sequential(
-            nn.Conv2d(self.feature_number, 1, 1), nn.Sigmoid()
-        )
-        self.fc = nn.Linear(self.feature_number, num_classes)
+        self.attn_conv = nn.Sequential(nn.Conv2d(2048, 1, 1), nn.Sigmoid())
+        self.fc = nn.Linear(2048, num_classes)
         self.mask_ = None
 
     def _make_layer(self, block, planes, blocks, stride=1, down_size=True):
         downsample = None
         layers = []
-        layers.append(block(self.feature_number, 1024, stride, downsample))
+        layers.append(block(2048, 1024, stride, downsample))
         if down_size:
             self.inplanes = planes * block.expansion
             for i in range(1, blocks):
@@ -250,18 +223,6 @@ class SimpleAttentionEfficientNetwork(nn.Module):
 
         return self.fc(rx)
 
-    def get_features(self, x):
-        x = self.base_model.extract_features(x)
-
-        attn = self.attn_resnet_block(x)
-        attn = self.attn_conv(attn)  # [B, 1, H, W]
-        B, _, H, W = attn.shape
-        self.mask_ = attn.detach().cpu()
-        rx = x * attn
-        rx = rx + x
-        rx = F.adaptive_avg_pool2d(rx, (1, 1))
-        return rx.reshape(B, -1)  # * [1,1280]のベクトル
-
     def save_attention_mask(self, x, path):
         B = x.shape[0]
         self.forward(x)
@@ -275,15 +236,7 @@ class SimpleAttentionEfficientNetwork(nn.Module):
         plt.savefig(path)
         plt.close()
 
-    def output_attention_mask_with_prediction(self, x):
+    def output_attention_mask(self, x):
         B = x.shape[0]
         prediction = self.forward(x)
         return self.mask_, prediction
-
-    def output_attention_mask_with_features(self, x):
-        B = x.shape[0]
-        features = self.get_features(x)
-        return self.mask_, features
-
-
-# %%

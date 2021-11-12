@@ -1,7 +1,3 @@
-"""
-__author__: Abhishek Thakur
-"""
-
 import numpy as np
 import torch
 from PIL import Image, ImageFile

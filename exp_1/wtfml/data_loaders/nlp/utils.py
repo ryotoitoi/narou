@@ -32,9 +32,8 @@ def clean_sentence(sentence: str) -> str:
         sentence,
     )  # 記号
     sentence = re.sub(r"https?://[\w/:%#\$&\?\(\)~\.=\+\-]+", "", sentence)
-    sentence = re.sub(r"[0-9０-９a-zA-Zａ-ｚＡ-Ｚ]+", " ", sentence)
-
-    # ！小川：絵文字のエラーの解消（コメントアウトされていたものは削除しました。）！
+    sentence = sentence.replace("'🏻'", " ")
+    sentence = re.sub(r"[0-9０-９a-zA-Zａ-ｚＡ-Ｚ]+", "", sentence) # " "にしたほうがいいかも
     sentence = "".join(
         [
             "絵文字" + emoji_dict.get(c, {"short_name": ""}).get("short_name", "")

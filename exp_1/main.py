@@ -30,7 +30,6 @@ train_data_path = "data/train.csv"
 
 data_df = pd.read_csv(train_data_path)
 
-df = pd.read_csv("../data/train.csv")
 sentence_list = []
 cnt = 0
 for t, s, k in zip(data_df["title"], data_df["story"], data_df["keyword"]):

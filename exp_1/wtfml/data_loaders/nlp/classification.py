@@ -17,7 +17,7 @@ class BERTSimpleDataset:
         self.tokenizer = BertJapaneseTokenizer.from_pretrained(
             "cl-tohoku/bert-base-japanese-whole-word-masking"
         )
-        self.max_len = 144  # twitter
+        self.max_len = 250
         self.clearning_function = clearning_function
 
     def __len__(self):

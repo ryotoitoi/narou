@@ -3,6 +3,7 @@ import os
 import shutil
 
 import pandas as pd
+import numpy as np
 import pytorch_lightning as pl
 import torch
 import wandb
@@ -27,7 +28,21 @@ save_folder = "exp_1/model/{}".format(d_today)
 train_data_path = "data/train.csv"
 
 
-data_df = pd.read_csv(train_data_path).dropna(subset=["title"]).reset_index()
+data_df = pd.read_csv(train_data_path)
+
+df = pd.read_csv("../data/train.csv")
+sentence_list = []
+cnt = 0
+for t, s, k in zip(data_df["title"], data_df["story"], data_df["keyword"]):
+    if t is np.nan:
+        sentence = s+k
+        sentence_list.append(sentence)
+    elif k is np.nan:
+        sentence = t+s    
+        sentence_list.append(sentence)
+    else:
+        sentence_list.append(sentence)
+data_df["sentece"] = sentence_list
 
 input_train , input_val = train_test_split(data_df, test_size=0.2, shuffle=True)
 input_train = input_train.reset_index()
@@ -37,10 +52,10 @@ target_val = input_val["fav_novel_cnt_bin"]
 
 
 train_dataset = BERTSimpleDataset(
-    input_texts=input_train["title"], target=target_train
+    input_texts=input_train["sentence"], target=target_train
 )
 val_dataset = BERTSimpleDataset(
-    input_texts=input_val["title"], target=target_val
+    input_texts=input_val["sentence"], target=target_val
 )
 
 data_module = plDataModule(

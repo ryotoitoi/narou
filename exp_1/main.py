@@ -41,7 +41,7 @@ for t, s, k in zip(data_df["title"], data_df["story"], data_df["keyword"]):
         sentence_list.append(sentence)
     else:
         sentence_list.append(sentence)
-data_df["sentece"] = sentence_list
+data_df["sentence"] = sentence_list
 
 input_train , input_val = train_test_split(data_df, test_size=0.2, shuffle=True)
 input_train = input_train.reset_index()

@@ -7,10 +7,8 @@ from glob import glob
 
 import torch
 import transformers
-from tqdm.notebook import tqdm
+from tqdm import tqdm
 tqdm.pandas()
-
-
 
 class BertSequenceVectorizer:
     def __init__(self, model_name: str):

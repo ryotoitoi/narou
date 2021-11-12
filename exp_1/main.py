@@ -40,6 +40,7 @@ for t, s, k in zip(data_df["title"], data_df["story"], data_df["keyword"]):
         sentence = t+s    
         sentence_list.append(sentence)
     else:
+        sentence = t+s+k
         sentence_list.append(sentence)
 data_df["sentence"] = sentence_list
 

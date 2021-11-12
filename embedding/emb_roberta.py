@@ -20,7 +20,7 @@ class BertSequenceVectorizer:
         self.tokenizer.do_lower_case = True 
         self.bert_model = transformers.RobertaModel.from_pretrained(self.model_name)
         self.bert_model = self.bert_model.to(self.device)
-        self.max_len = 128
+        self.max_len = 200
 
 
     def vectorize(self, sentence : str) -> np.array:

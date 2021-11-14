@@ -4,3 +4,4 @@ wandb/
 npy.zip
 *.pkl
 *.npy
+npy/

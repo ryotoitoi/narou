@@ -1,6 +1,5 @@
 .DS_Store
 outputs/
 wandb/
-*.npy
 npy.zip
 *.pkl

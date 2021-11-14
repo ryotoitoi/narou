@@ -1,12 +1,9 @@
-# lightgbmを試す。
-
 import pandas as pd
 import numpy as np
 import re
 from glob import glob
 from tqdm import tqdm
 import optuna
-
 import optuna.integration.lightgbm as lgb
 
 from lightgbm import early_stopping
@@ -15,16 +12,18 @@ from lightgbm import log_evaluation
 from sklearn.model_selection import train_test_split
 from wandb.lightgbm import wandb_callback
 import wandb
-from sklearn.model_selection import RepeatedKFold
+
+from preprocessing import preprocessing
+
 from tqdm.notebook import tqdm
 tqdm.pandas()
-
-wandb.init(project="narou", entity="ryotoitoi", name = "exp8_narou_roberta_lgb_pca")
+preprocessing()
+wandb.init(project="narou", entity="ryotoitoi", name = "exp_6_narou")
 
 ### ファイル読み込み・データ確認
 
-df_train = pd.read_pickle('exp_7_robert_lgb_pca/data/train.pkl')
-df_test = pd.read_pickle('exp_7_robert_lgb_pca/data/test.pkl')
+df_train = pd.read_pickle('exp_6/data/train.pkl')
+df_test = pd.read_pickle('exp_6/data/test.pkl')
 sub_df = pd.read_csv('./data/sample_submission.csv')
 train_x = df_train.drop(columns="fav_novel_cnt_bin")
 train_y = df_train[["fav_novel_cnt_bin"]]
@@ -62,4 +61,4 @@ feature_imp = pd.DataFrame(sorted(zip(model.feature_importance(), train_x.column
 
 test_pred = model.predict(df_test, num_iteration=model.best_iteration)
 sub_df.iloc[:, 1:] = test_pred
-sub_df.to_csv('./output/exp8_lgb_submission.csv', index=False)
+sub_df.to_csv('./output/exp6_submission.csv', index=False)

@@ -13,13 +13,14 @@ import ginza
 import ja_ginza_electra
 # pandas高速化
 from pandarallel import pandarallel
-pandarallel.initialize(progress_bar=True)
+# pandarallel.initialize(progress_bar=True)
+pandarallel.initialize()
 
 print("Load data!")
 train = pd.read_csv("data/train.csv")
 test = pd.read_csv("data/test.csv")
 def wakati_rm_func(x):
-    if x is not np.nan:
+    try:
         nlp = spacy.load('ja_ginza_electra')
         sentence = x
         
@@ -49,8 +50,8 @@ def wakati_rm_func(x):
 
         result = " ".join(tmp_words_list)
         return result
-    else:
-        return " "
+    except:
+        return np.nan
 
 # trainに分かち書きを実行する
 train["story_wakati"] = train[["story"]].parallel_apply(wakati_rm_func)
@@ -61,6 +62,9 @@ train["keyword_wakati"] = train[["keyword"]].parallel_apply(wakati_rm_func)
 test["story_wakati"] = test[["story"]].parallel_apply(wakati_rm_func)
 test["title_wakati"] = test[["title"]].parallel_apply(wakati_rm_func)
 test["keyword_wakati"] = test[["keyword"]].parallel_apply(wakati_rm_func)
+
+train = train.fillna("欠損")
+test = test.fillna("欠損")
 
 # Countvectorizeする
 from sklearn.feature_extraction.text import CountVectorizer
@@ -95,29 +99,29 @@ pd.concat([count_vec_story_test, count_vec_title_test, count_vec_keyword_test]).
 
 # TI-IDFを計算する
 from sklearn.feature_extraction.text import TfidfVectorizer
-model = TfidfVectorizer(max_df=0.9)
+model = TfidfVectorizer()
 X = model.fit_transform(train["story_wakati"])
 story_tfidf_train = pd.DataFrame(data= X.toarray(), columns = model.get_feature_names())
 
-model = TfidfVectorizer(max_df=0.9)
+model = TfidfVectorizer()
 X = model.fit_transform(train["title_wakati"])
 title_tfidf_train = pd.DataFrame(data= X.toarray(), columns = model.get_feature_names())
 
-model = TfidfVectorizer(max_df=0.9)
+model = TfidfVectorizer()
 X = model.fit_transform(train["keyword_wakati"])
 keyword_tfidf_train = pd.DataFrame(data= X.toarray(), columns = model.get_feature_names())
 
 pd.concat([story_tfidf_train, title_tfidf_train, keyword_tfidf_train]).to_pickle("data/train_tfidf.pkl")
 
-model = TfidfVectorizer(max_df=0.9)
+model = TfidfVectorizer()
 X = model.fit_transform(test["story_wakati"])
 story_tfidf_test = pd.DataFrame(data= X.toarray(), columns = model.get_feature_names())
 
-model = TfidfVectorizer(max_df=0.9)
+model = TfidfVectorizer()
 X = model.fit_transform(test["title_wakati"])
 title_tfidf_test = pd.DataFrame(data= X.toarray(), columns = model.get_feature_names())
 
-model = TfidfVectorizer(max_df=0.9)
+model = TfidfVectorizer()
 X = model.fit_transform(test["keyword_wakati"])
 keyword_tfidf_test = pd.DataFrame(data= X.toarray(), columns = model.get_feature_names())
 

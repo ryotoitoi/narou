@@ -86,7 +86,7 @@ train = pd.read_csv(DATA_DIR / 'train.csv')
 test = pd.read_csv(DATA_DIR / 'test.csv')
 
 BSV = BertSequenceVectorizer('rinna/japanese-roberta-base')
-
+os.makedirs("npy", exist_ok=True)
 for col in ['title', 'story', 'keyword']:
     print('##########' + col + '##########')
     train[col] = train[col].fillna('NaN')

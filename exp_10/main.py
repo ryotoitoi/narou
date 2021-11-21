@@ -6,8 +6,8 @@ import pickle
 from glob import glob
 from tqdm import tqdm
 import optuna
-# import optuna.integration.lightgbm as lgb
-import lightgbm as lgb
+import optuna.integration.lightgbm as lgb
+# import lightgbm as lgb
 
 from lightgbm import early_stopping
 from lightgbm import log_evaluation
@@ -19,7 +19,7 @@ import wandb
 from tqdm.auto import tqdm
 tqdm.pandas()
 
-exp_num = "exp_9"
+exp_num = "exp_10"
 wandb.init(project="narou", entity="ryotoitoi", name = f"{exp_num}_narou")
 
 ### ファイル読み込み・データ確認

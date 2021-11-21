@@ -9,15 +9,15 @@ import re
 import regex
 import torch
 import transformers
-from tqdm.auto import tqdm
-tqdm.pandas()
 import json
 import os
 import emoji
 import mojimoji
 import neologdn
-from pandarallel import pandarallel
-pandarallel.initialize()
+from tqdm.auto import tqdm
+tqdm.pandas()
+
+
 
 emoji_json_path = "./emoji/emoji_ja.json"
 json_open = open(emoji_json_path)
@@ -91,5 +91,5 @@ for col in ['title', 'story', 'keyword']:
     print('##########' + col + '##########')
     train[col] = train[col].fillna('NaN')
     test[col] = test[col].fillna('NaN')
-    np.save(f'./npy/train_{col}_roberta', np.stack(train[col].parallel_apply(lambda x: BSV.vectorize(x))))
-    np.save(f'./npy/test_{col}_roberta', np.stack(test[col].parallel_apply(lambda x: BSV.vectorize(x))))
+    np.save(f'./npy/train_{col}_roberta', np.stack(train[col].progress_apply(lambda x: BSV.vectorize(x))))
+    np.save(f'./npy/test_{col}_roberta', np.stack(test[col].progress_apply(lambda x: BSV.vectorize(x))))

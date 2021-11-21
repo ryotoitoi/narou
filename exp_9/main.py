@@ -32,6 +32,7 @@ y = df_train[["fav_novel_cnt_bin"]]
 
 skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
 fold = 0
+print("start training")
 for train_index, test_index in skf.split(X, y):
     print("TRAIN:", train_index, "TEST:", test_index)
     train_x, val_x = X.iloc[train_index, :], X.iloc[test_index, :]
@@ -63,13 +64,14 @@ for train_index, test_index in skf.split(X, y):
     model_save_path = f'{exp_num}/model/model_fold{fold}.pkl'
     pickle.dump(model, open(model_save_path, 'wb'))
 
-    # 学習済みモデルを削除
-    del model
     test_pred = model.predict(df_test, num_iteration=model.best_iteration)
     sub_df.iloc[:, 1:] = test_pred
     os.makedirs(f"{exp_num}/output", exist_ok=True)
     sub_df.to_csv(f'{exp_num}/output/{exp_num}_fold{fold}.csv', index=False)
     fold += 1
+
+    # 学習済みモデルを削除（メモリの節約的な意味）
+    del model
 
 print("Finish Training.")
 sub_df = pd.DataFrame()
@@ -77,4 +79,4 @@ for i in range(10):
     tmp_df = pd.read_csv(f"./{exp_num}/output/{exp_num}_fold{i}.csv")
     sub_df = pd.concat([sub_df, tmp_df])
 
-sub_df.groupby("ncode").mean().reset_index().to_csv("./{exp_num}/output/submit.csv", index=False)
+sub_df.groupby("ncode").mean().reset_index().to_csv(f"./{exp_num}/output/submit.csv", index=False)

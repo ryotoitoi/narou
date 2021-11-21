@@ -18,7 +18,7 @@ import wandb
 from tqdm.auto import tqdm
 tqdm.pandas()
 
-exp_num = "exp_8"
+exp_num = "exp_9"
 wandb.init(project="narou", entity="ryotoitoi", name = f"{exp_num}_narou")
 
 ### ファイル読み込み・データ確認
@@ -70,4 +70,4 @@ for i in range(10):
     tmp_df = pd.read_csv(f"./{exp_num}/output/{exp_num}_fold{i}.csv")
     sub_df = pd.concat([sub_df, tmp_df])
 
-sub_df.groupby("ncode").mean().reset_index().to_csv(f"./{exp_num}/output/submit.csv", index=False)
+sub_df.groupby("ncode").mean().reset_index().to_csv("./{exp_num}/output/submit.csv", index=False)

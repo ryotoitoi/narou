@@ -18,9 +18,8 @@ import emoji
 import mojimoji
 import neologdn
 
-exp_num = "exp_8"
-
-working_direction = os.getcwd()
+# 実験数の設定
+exp_num = "exp_9"
 
 emoji_json_path = "./emoji/emoji_ja.json"
 json_open = open(emoji_json_path)
@@ -186,27 +185,38 @@ def create_type_features(texts):
     return type_df
 
 # 文字種ベースの特徴量を作成
-story_type_df = create_type_features(df_train["story"])
-story_type_df.columns = ['story_' + colname for colname in story_type_df.columns]
-title_type_df = create_type_features(df_train["title"])
-title_type_df.columns = ['title_' + colname for colname in title_type_df.columns]
+print("文字種ベースの特徴量を作成")
+# train_story
+story_type_train = create_type_features(df_train["story"])
+story_type_train.columns = ['story_' + colname for colname in story_type_train.columns]
+
+# test_story
+story_type_test= create_type_features(df_test["story"])
+story_type_test.columns = ['story_' + colname for colname in story_type_test.columns]
+
+# train_title
+title_type_train = create_type_features(df_train["title"])
+title_type_train.columns = ['title_' + colname for colname in title_type_train.columns]
+
+# test_title
+title_type_test = create_type_features(df_test["title"])
+title_type_test.columns = ['title_' + colname for colname in title_type_test.columns]
 
 ## dfをまとめる
-df_train = pd.concat([df_train_num, train_title_df, train_story_df, df_train[["general_firstup"]], story_type_df, title_type_df], axis=1)
-df_test = pd.concat([df_test_num, test_title_df, test_story_df, story_type_df, title_type_df], axis=1)
-
+df_train = pd.concat([df_train_num, train_title_df, train_story_df, df_train[["general_firstup"]], story_type_train, title_type_train], axis=1)
+df_test = pd.concat([df_test_num, test_title_df, test_story_df, story_type_test, title_type_test], axis=1)
 
 ## 学習データの期間を変更してみる
 df_train["datetime"] = df_train['general_firstup'].apply(lambda x: datetime.datetime.strptime(x, '%Y-%m-%d %H:%M:%S').date())
-df_train = df_train[df_train["datetime"] > datetime.date(2019,1,1)].drop(columns=["datetime", "general_firstup"])
+df_train = df_train[df_train["datetime"] > datetime.date(2020,1,1)].drop(columns=["datetime", "general_firstup"])
 print(df_train.shape)
+
 ## 作成したデータを保存する
-import os
-os.makedirs("./{exp_num}/data", exist_ok=True)
+os.makedirs(f"./{exp_num}/data", exist_ok=True)
 
 print(df_train.shape)
 print(df_test.shape)
 
-df_train.to_pickle("./{exp_num}/data/train.pkl")
-df_test.to_pickle("./{exp_num}/data/test.pkl")
+df_train.to_pickle(f"./{exp_num}/data/train.pkl")
+df_test.to_pickle(f"./{exp_num}/data/test.pkl")
 logger.info("finsh preprocessing")

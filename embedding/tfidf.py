@@ -53,15 +53,15 @@ def wakati_rm_func(x):
     except:
         return np.nan
 
-# trainに分かち書きを実行する
-train["story_wakati"] = train[["story"]].parallel_apply(wakati_rm_func)
-train["title_wakati"] = train[["title"]].parallel_apply(wakati_rm_func)
-train["keyword_wakati"] = train[["keyword"]].parallel_apply(wakati_rm_func)
+df = pd.concat([train, test])
 
-# testに分かち書きを実行する
-test["story_wakati"] = test[["story"]].parallel_apply(wakati_rm_func)
-test["title_wakati"] = test[["title"]].parallel_apply(wakati_rm_func)
-test["keyword_wakati"] = test[["keyword"]].parallel_apply(wakati_rm_func)
+# trainに分かち書きを実行する
+df["story_wakati"] = df[["story"]].parallel_apply(wakati_rm_func)
+df["title_wakati"] = df[["title"]].parallel_apply(wakati_rm_func)
+df["keyword_wakati"] = df[["keyword"]].parallel_apply(wakati_rm_func)
+
+train = df.iloc[:40000]
+test = df.iloc[40000:]
 
 train = train.fillna("欠損")
 test = test.fillna("欠損")
@@ -124,5 +124,5 @@ title_tfidf_test = pd.DataFrame(data= X.toarray(), columns = model.get_feature_n
 model = TfidfVectorizer()
 X = model.fit_transform(test["keyword_wakati"])
 keyword_tfidf_test = pd.DataFrame(data= X.toarray(), columns = model.get_feature_names())
-
+print(story_tfidf_test.shape)
 pd.concat([story_tfidf_test, title_tfidf_test, keyword_tfidf_test]).to_pickle("data/test_tfidf.pkl")

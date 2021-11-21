@@ -4,7 +4,8 @@ import re
 from glob import glob
 from tqdm import tqdm
 import optuna
-import optuna.integration.lightgbm as lgb
+# import optuna.integration.lightgbm as lgb
+import lightgbm as lgb
 
 from lightgbm import early_stopping
 from lightgbm import log_evaluation
@@ -15,7 +16,7 @@ import wandb
 
 from preprocessing import preprocessing
 
-from tqdm.notebook import tqdm
+from tqdm.auto import tqdm
 tqdm.pandas()
 preprocessing()
 wandb.init(project="narou", entity="ryotoitoi", name = "exp_6_narou")
@@ -49,15 +50,8 @@ model = lgb.train(
     categorical_feature = cat_cols,
     valid_names = ['train', 'valid'],
     valid_sets =[train_data, val_data], 
-    verbose_eval=50, 
     callbacks=[wandb_callback(), early_stopping(30), log_evaluation(30)], 
 )
-
-val_pred = model.predict(val_x, num_iteration=model.best_iteration)
-
-pred_df = pd.DataFrame(sorted(zip(val_x.index, val_pred, val_y)), columns=['index', 'predict', 'actual'])
-
-feature_imp = pd.DataFrame(sorted(zip(model.feature_importance(), train_x.columns)), columns=['importance', 'feature'])
 
 test_pred = model.predict(df_test, num_iteration=model.best_iteration)
 sub_df.iloc[:, 1:] = test_pred

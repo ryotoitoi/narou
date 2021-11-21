@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import os
 import re
+import pickle
 from glob import glob
 from tqdm import tqdm
 import optuna
@@ -57,6 +58,14 @@ for train_index, test_index in skf.split(X, y):
         valid_sets =[train_data, val_data], 
         callbacks=[wandb_callback(), early_stopping(10), log_evaluation(10)], 
     )
+
+    # 学習したモデルを保存する
+    os.makedirs(f"{exp_num}/model", exist_ok=True)
+    model_save_path = f'{exp_num}/model/model_fold{fold}.pkl'
+    pickle.dump(model, open(model_save_path, 'wb'))
+
+    # 学習済みモデルを削除
+    del model
 
     test_pred = model.predict(df_test, num_iteration=model.best_iteration)
     sub_df.iloc[:, 1:] = test_pred

@@ -5,12 +5,44 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from pathlib import Path
 from glob import glob
-
+import re
+import regex
 import torch
 import transformers
-from tqdm import tqdm
+from tqdm.auto import tqdm
 tqdm.pandas()
+import json
+import os
+import emoji
+import mojimoji
+import neologdn
 
+emoji_json_path = "./emoji/emoji_ja.json"
+json_open = open(emoji_json_path)
+emoji_dict = json.load(json_open)
+
+
+def clean_sentence(sentence: str) -> str:
+    sentence = re.sub(r"<[^>]*?>", "", sentence)  # タグ除外
+    sentence = mojimoji.zen_to_han(sentence, kana=False)
+    sentence = neologdn.normalize(sentence)
+    sentence = re.sub(
+        r'[!"#$%&\'\\\\()*+,\-./:;<=>?@\[\]\^\_\`{|}~「」〔〕“”〈〉『』【】＆＊・（）＄＃＠？！｀＋￥％︰-＠]。、♪',
+        " ",
+        sentence,
+    )  # 記号
+    sentence = re.sub(r"https?://[\w/:%#\$&\?\(\)~\.=\+\-]+", "", sentence)
+    sentence = re.sub(r"[0-9０-９a-zA-Zａ-ｚＡ-Ｚ]+", " ", sentence)
+
+    sentence = "".join(
+        [
+            "絵文字" + emoji_dict.get(c, {"short_name": ""}).get("short_name", "")
+            if c in emoji.UNICODE_EMOJI["en"]
+            else c
+            for c in sentence
+        ]
+    )
+    return sentence
 class BertSequenceVectorizer:
     def __init__(self, model_name: str):
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'

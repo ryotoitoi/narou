@@ -15,11 +15,12 @@ from lightgbm import log_evaluation
 from sklearn.model_selection import StratifiedKFold
 from wandb.lightgbm import wandb_callback
 import wandb
-
+from catboost import Pool
+from catboost import CatBoostClassifier
 from tqdm.auto import tqdm
 tqdm.pandas()
 
-exp_num = "exp_11"
+exp_num = "exp_12"
 wandb.init(project="narou", entity="ryotoitoi", name = f"{exp_num}_narou")
 
 ### ファイル読み込み・データ確認
@@ -37,37 +38,40 @@ for train_index, test_index in skf.split(X, y):
     print("TRAIN:", train_index, "TEST:", test_index)
     train_x, val_x = X.iloc[train_index, :], X.iloc[test_index, :]
     train_y, val_y = y.iloc[train_index, :], y.iloc[test_index, :]
+
+
+
+    # カテゴリのカラムのみを抽出
+    categorical_features_indices = np.where((train_x.dtypes != np.float32) & (X.dtypes != np.float64))[0]
+
+
+    # データセットの作成。Poolで説明変数、目的変数、
+    # カラムのデータ型を指定できる
+    train_pool = Pool(train_x, val_x, cat_features=categorical_features_indices)
+    validate_pool = Pool(train_y, val_y, cat_features=categorical_features_indices)
+
     params = {
-        'objective': 'multiclass',
-        'num_classes': 5,
-        "verbosity": -1,
-        'metric': 'multi_logloss',
-        "seed": 42
+        'loss_function':'MultiClass',
+        "classes_count":5,
+        'depth' : 6,                  # 木の深さ
+        'learning_rate' : 0.05,       # 学習率
+        'early_stopping_rounds':10,
+        'iterations' : 10, 
+        'custom_loss' :['Accuracy'], 
+        'random_seed' :42,
+        "verbose":True,
+
     }
-
-    train_data = lgb.Dataset(train_x, label=train_y)
-    val_data = lgb.Dataset(val_x, label=val_y)
-
-    cat_cols = [
-        "ncode_num", "userid", 'biggenre', 'genre', 'novel_type', 'end', 'isstop', 'isr15', 
-        'isbl', 'isgl', 'iszankoku', 'istensei', 'istenni', 'pc_or_k',
-        "userid_le","writer_le","genre_le", 'userid_ce', 'writer_ce', 'genre_ce']
-
-    print("start training")
-    model = lgb.train(
-        params,
-        train_data, 
-        categorical_feature = cat_cols,
-        valid_names = ['train', 'valid'],
-        valid_sets =[train_data, val_data], 
-        callbacks=[wandb_callback(), early_stopping(10), log_evaluation(10)], 
-    )
+    # パラメータを指定した場合は、以下のようにインスタンスに適用させる
+    model = CatBoostClassifier(**params)
+    model.fit(train_pool, eval_set=validate_pool)
+    
     # 学習したモデルを保存する
     os.makedirs(f"{exp_num}/model", exist_ok=True)
     model_save_path = f'{exp_num}/model/model_fold{fold}.pkl'
     pickle.dump(model, open(model_save_path, 'wb'))
 
-    test_pred = model.predict(df_test, num_iteration=model.best_iteration)
+    test_pred = model.predict_proba(df_test)
     sub_df.iloc[:, 1:] = test_pred
     os.makedirs(f"{exp_num}/output", exist_ok=True)
     sub_df.to_csv(f'{exp_num}/output/{exp_num}_fold{fold}.csv', index=False)

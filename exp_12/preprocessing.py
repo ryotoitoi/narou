@@ -21,7 +21,7 @@ import mojimoji
 import neologdn
 
 # 実験数の設定
-exp_num = "exp_11"
+exp_num = "exp_12"
 
 emoji_json_path = "./emoji/emoji_ja.json"
 json_open = open(emoji_json_path)
@@ -242,13 +242,13 @@ train_label_df = le_df.iloc[:40000]
 test_label_df = le_df.iloc[40000:].reset_index(drop = True)
 
 
-## dfをまとめる
+## dfをまとめる(keywordを削除)
 df_train = pd.concat(
     [df_train_num, train_title_df, train_story_df,train_keyword_df,  
     df_train[["general_firstup"]], story_type_train, title_type_train, train_label_df], 
     axis=1)
 df_test = pd.concat(
-    [df_test_num, test_title_df, test_story_df,test_keyword_df,  story_type_test, title_type_test,test_label_df], 
+    [df_test_num, test_title_df, test_story_df,test_keyword_df, story_type_test, title_type_test,test_label_df], 
     axis=1)
 
 ## 学習データの期間を変更してみる

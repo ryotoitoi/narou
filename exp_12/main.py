@@ -47,8 +47,8 @@ for train_index, test_index in skf.split(X, y):
 
     # データセットの作成。Poolで説明変数、目的変数、
     # カラムのデータ型を指定できる
-    train_pool = Pool(train_x, val_x, cat_features=categorical_features_indices)
-    validate_pool = Pool(train_y, val_y, cat_features=categorical_features_indices)
+    train_pool = Pool(train_x, train_y, cat_features=categorical_features_indices)
+    validate_pool = Pool(val_x, val_y, cat_features=categorical_features_indices)
 
     params = {
         'loss_function':'MultiClass',
@@ -56,7 +56,7 @@ for train_index, test_index in skf.split(X, y):
         'depth' : 6,                  # 木の深さ
         'learning_rate' : 0.05,       # 学習率
         'early_stopping_rounds':10,
-        'iterations' : 10, 
+        'iterations' : 500, 
         'custom_loss' :['Accuracy'], 
         'random_seed' :42,
         "verbose":True,

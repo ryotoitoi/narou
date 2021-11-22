@@ -18,7 +18,7 @@ from catboost import CatBoostClassifier
 from tqdm.auto import tqdm
 tqdm.pandas()
 
-exp_num = "exp_13"
+exp_num = "exp_14"
 
 ### ファイル読み込み・データ確認
 
@@ -48,13 +48,14 @@ for train_index, test_index in skf.split(X, y):
     params = {
         'loss_function':'MultiClass',
         "classes_count":5,
-        'depth' : 12,                  # 木の深さ
+        'depth' : 10,                  # 木の深さ
         'learning_rate' : 0.05,       # 学習率
         'early_stopping_rounds':10,
         'iterations' : 500, 
         'custom_loss' :['Accuracy'], 
         'random_seed' :42,
         "verbose":True,
+
     }
     # パラメータを指定した場合は、以下のようにインスタンスに適用させる
     model = CatBoostClassifier(**params)

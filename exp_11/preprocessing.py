@@ -21,7 +21,7 @@ import mojimoji
 import neologdn
 
 # 実験数の設定
-exp_num = "exp_10"
+exp_num = "exp_11"
 
 emoji_json_path = "./emoji/emoji_ja.json"
 json_open = open(emoji_json_path)
@@ -113,11 +113,11 @@ title = np.concatenate([train_title, test_title])
 story = np.concatenate([train_story, test_story])
 keyword = np.concatenate([train_keyword, test_keyword])
 
-svd = TruncatedSVD(300)
+svd = TruncatedSVD(60)
 title = svd.fit_transform(title)
-svd = TruncatedSVD(300)
+svd = TruncatedSVD(60)
 story = svd.fit_transform(story)
-svd = TruncatedSVD(300)
+svd = TruncatedSVD(60)
 keyword = svd.fit_transform(keyword)
 
 train_title = title[:40000]
@@ -223,18 +223,37 @@ title_type_train.columns = ['title_' + colname for colname in title_type_train.c
 title_type_test = create_type_features(df_test["title"])
 title_type_test.columns = ['title_' + colname for colname in title_type_test.columns]
 
+# label_encoding
+df = pd.concat([df_train, df_test])
+from sklearn import preprocessing
+le = preprocessing.LabelEncoder()
+genre_label = le.fit_transform(df["genre"])
+le = preprocessing.LabelEncoder()
+userid_label = le.fit_transform(df["userid"])
+le = preprocessing.LabelEncoder()
+writer_label = le.fit_transform(df["writer"])
+le_df = pd.DataFrame(data = {"userid_le":userid_label, "writer_le":writer_label, "genre_le":genre_label})
+
+# count_encoding
+le_df['userid_ce'] = le_df.groupby('userid_le')["userid_le"].transform('count')
+le_df['writer_ce'] = le_df.groupby('writer_le')["writer_le"].transform('count')
+le_df['genre_ce'] = le_df.groupby('genre_le')["genre_le"].transform('count')
+train_label_df = le_df.iloc[:40000]
+test_label_df = le_df.iloc[40000:].reset_index(drop = True)
+
+
 ## dfをまとめる
 df_train = pd.concat(
     [df_train_num, train_title_df, train_story_df,train_keyword_df,  
-    df_train[["general_firstup"]], story_type_train, title_type_train], 
+    df_train[["general_firstup"]], story_type_train, title_type_train, train_label_df], 
     axis=1)
 df_test = pd.concat(
-    [df_test_num, test_title_df, test_story_df,test_keyword_df,  story_type_test, title_type_test,], 
+    [df_test_num, test_title_df, test_story_df,test_keyword_df,  story_type_test, title_type_test,test_label_df], 
     axis=1)
 
 ## 学習データの期間を変更してみる
 df_train["datetime"] = df_train['general_firstup'].apply(lambda x: datetime.datetime.strptime(x, '%Y-%m-%d %H:%M:%S').date())
-df_train = df_train[df_train["datetime"] > datetime.date(2020,1,1)].drop(columns=["datetime", "general_firstup"])
+df_train = df_train[df_train["datetime"] > datetime.date(2021,1,1)].drop(columns=["datetime", "general_firstup"])
 print(df_train.shape)
 
 ## 作成したデータを保存する

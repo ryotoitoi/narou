@@ -39,8 +39,6 @@ for train_index, test_index in skf.split(X, y):
     train_x, val_x = X.iloc[train_index, :], X.iloc[test_index, :]
     train_y, val_y = y.iloc[train_index, :], y.iloc[test_index, :]
 
-
-
     # カテゴリのカラムのみを抽出
     categorical_features_indices = np.where((train_x.dtypes != np.float32) & (X.dtypes != np.float64))[0]
 

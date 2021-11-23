@@ -48,10 +48,10 @@ for train_index, test_index in skf.split(X, y):
     params = {
         'loss_function':'MultiClass',
         "classes_count":5,
-        'depth' : 10,                  # 木の深さ
-        'learning_rate' : 0.05,       # 学習率
+        'depth' : 8,                  # 木の深さ
+        'learning_rate' : 0.01,       # 学習率
         'early_stopping_rounds':10,
-        'iterations' : 500, 
+        'iterations' : 1000, 
         'custom_loss' :['Accuracy'], 
         'random_seed' :42,
         "verbose":True,

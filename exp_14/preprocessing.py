@@ -113,11 +113,11 @@ title = np.concatenate([train_title, test_title])
 story = np.concatenate([train_story, test_story])
 keyword = np.concatenate([train_keyword, test_keyword])
 
-svd = TruncatedSVD(100)
+svd = TruncatedSVD(60)
 title = svd.fit_transform(title)
-svd = TruncatedSVD(100)
+svd = TruncatedSVD(60)
 story = svd.fit_transform(story)
-svd = TruncatedSVD(100)
+svd = TruncatedSVD(60)
 keyword = svd.fit_transform(keyword)
 
 train_title = title[:40000]
@@ -161,7 +161,7 @@ test_keyword = pd.read_pickle("./univ_embedding/univ_keyword_test.pkl")
 tmp_keyword_df = pd.concat([train_keyword, test_keyword])
 
 # 次元圧縮
-svd = TruncatedSVD(100)
+svd = TruncatedSVD(60)
 title_univ = svd.fit_transform(tmp_title_df)
 train_title_univ = title_univ[:40000]
 test_title_univ = title_univ[40000:]
@@ -172,7 +172,7 @@ for col_name in train_title_univ_df.columns:
 for col_name in test_title_univ_df.columns:
     test_title_univ_df = test_title_univ_df.rename(columns = {col_name:f"title_univ_{col_name}"})
 
-svd = TruncatedSVD(100)
+svd = TruncatedSVD(60)
 story_univ = svd.fit_transform(tmp_story_df)
 train_story_univ = story_univ[:40000]
 test_story_univ = story_univ[40000:]
@@ -183,7 +183,7 @@ for col_name in train_story_univ_df.columns:
 for col_name in test_story_univ_df.columns:
     test_story_univ_df = test_story_univ_df.rename(columns = {col_name:f"story_univ_{col_name}"})
 
-svd = TruncatedSVD(100)
+svd = TruncatedSVD(60)
 keyword_univ = svd.fit_transform(tmp_keyword_df)
 train_keyword_univ = keyword_univ[:40000]
 test_keyword_univ = keyword_univ[40000:]

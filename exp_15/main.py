@@ -60,7 +60,7 @@ for train_index, test_index in skf.split(X, y):
         'custom_loss': ['Accuracy'],
         'random_seed': 42,
         "verbose": True,
-
+        'task_type':"GPU",
     }
     # パラメータを指定した場合は、以下のようにインスタンスに適用させる
     model = CatBoostClassifier(**params)

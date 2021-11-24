@@ -296,7 +296,7 @@ df_test = pd.concat(
 
 ## 学習データの期間を変更してみる
 df_train["datetime"] = df_train['general_firstup'].apply(lambda x: datetime.datetime.strptime(x, '%Y-%m-%d %H:%M:%S').date())
-df_train = df_train[df_train["datetime"] > datetime.date(2021,6,1)].drop(columns=["datetime", "general_firstup"])
+df_train = df_train[df_train["datetime"] > datetime.date(2021,1,1)].drop(columns=["datetime", "general_firstup"])
 print(df_train.shape)
 
 ## 作成したデータを保存する

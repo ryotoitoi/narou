@@ -57,7 +57,7 @@ for train_index, test_index in skf.split(X, y):
         'learning_rate': 0.05,       # 学習率
         'early_stopping_rounds': 10,
         'iterations': 10000,
-        'custom_loss': ['MultiLogloss'],
+        'custom_loss': ['Accuracy'],
         'random_seed': 42,
         "verbose": True,
         'task_type':"GPU",

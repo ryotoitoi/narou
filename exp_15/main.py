@@ -85,7 +85,7 @@ fig.add_trace(
     go.Bar(x=feature_importance, y=list(X.columns), orientation="h")
 )
 fig.show()
-fig.write_images("feature_importance.png")
+fig.write_image("feature_importance.png")
 
 print("Finish Training.")
 sub_df = pd.DataFrame()

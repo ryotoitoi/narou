@@ -57,14 +57,14 @@ for train_index, test_index in skf.split(X, y):
         'learning_rate': 0.05,       # 学習率
         'early_stopping_rounds': 10,
         'iterations': 10000,
-        'custom_loss': ['MultiLogloss'],
+        'custom_loss': ['Accuracy'],
         'random_seed': 42,
         "verbose": True,
         'task_type':"GPU",
     }
     # パラメータを指定した場合は、以下のようにインスタンスに適用させる
     model = CatBoostClassifier(**params)
-    model.fit(train_pool, eval_set=validate_pool, early_stopping_rounds=100)
+    model.fit(train_pool, eval_set=validate_pool)
 
     # 学習したモデルを保存する
     os.makedirs(f"{exp_num}/model", exist_ok=True)

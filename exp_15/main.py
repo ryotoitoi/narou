@@ -1,3 +1,4 @@
+import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
 import os
@@ -22,7 +23,7 @@ tqdm.pandas()
 
 exp_num = "exp_15"
 
-### ファイル読み込み・データ確認
+# ファイル読み込み・データ確認
 
 df_train = pd.read_pickle(f'{exp_num}/data/train.pkl')
 df_test = pd.read_pickle(f'{exp_num}/data/test.pkl')
@@ -39,30 +40,32 @@ for train_index, test_index in skf.split(X, y):
     train_y, val_y = y.iloc[train_index, :], y.iloc[test_index, :]
 
     # カテゴリのカラムのみを抽出
-    categorical_features_indices = np.where((train_x.dtypes != np.float32) & (X.dtypes != np.float64))[0]
-
+    categorical_features_indices = np.where(
+        (train_x.dtypes != np.float32) & (X.dtypes != np.float64))[0]
 
     # データセットの作成。Poolで説明変数、目的変数、
     # カラムのデータ型を指定できる
-    train_pool = Pool(train_x, train_y, cat_features=categorical_features_indices)
-    validate_pool = Pool(val_x, val_y, cat_features=categorical_features_indices)
+    train_pool = Pool(train_x, train_y,
+                      cat_features=categorical_features_indices)
+    validate_pool = Pool(
+        val_x, val_y, cat_features=categorical_features_indices)
 
     params = {
-        'loss_function':'MultiClass',
-        "classes_count":5,
-        'depth' : 10,                  # 木の深さ
-        'learning_rate' : 0.05,       # 学習率
-        'early_stopping_rounds':10,
-        'iterations' : 500, 
-        'custom_loss' :['Accuracy'], 
-        'random_seed' :42,
-        "verbose":True,
+        'loss_function': 'MultiClass',
+        "classes_count": 5,
+        'depth': 8,                  # 木の深さ
+        'learning_rate': 0.02,       # 学習率
+        'early_stopping_rounds': 10,
+        'iterations': 1500,
+        'custom_loss': ['Accuracy'],
+        'random_seed': 42,
+        "verbose": True,
 
     }
     # パラメータを指定した場合は、以下のようにインスタンスに適用させる
     model = CatBoostClassifier(**params)
     model.fit(train_pool, eval_set=validate_pool)
-    
+
     # 学習したモデルを保存する
     os.makedirs(f"{exp_num}/model", exist_ok=True)
     model_save_path = f'{exp_num}/model/model_fold{fold}.pkl'
@@ -75,21 +78,19 @@ for train_index, test_index in skf.split(X, y):
     fold += 1
 
 
+# Feature Importance
 feature_importance = model.get_feature_importance()
-# 棒グラフとしてプロットする
-plt.figure(figsize=(12, 4))
-plt.barh(range(len(feature_importance)),
-        feature_importance,
-        tick_label=list(X.columns))
+fig = go.Figure()
+fig.add_trace(
+    go.Bar(x=feature_importance, y=list(X.columns), orientation="h")
+)
+fig.show()
 
-plt.xlabel('importance')
-plt.ylabel('features')
-plt.grid()
-plt.show()
 print("Finish Training.")
 sub_df = pd.DataFrame()
 for i in range(10):
     tmp_df = pd.read_csv(f"./{exp_num}/output/{exp_num}_fold{i}.csv")
     sub_df = pd.concat([sub_df, tmp_df])
 
-sub_df.groupby("ncode").mean().reset_index().to_csv(f"./{exp_num}/output/submit.csv", index=False)
+sub_df.groupby("ncode").mean().reset_index().to_csv(
+    f"./{exp_num}/output/submit.csv", index=False)

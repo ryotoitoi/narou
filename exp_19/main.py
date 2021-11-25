@@ -72,7 +72,7 @@ def objective(trial):
         param["subsample"] = trial.suggest_float("subsample", 0.1, 1)
     
     if GPU_ENABLED:
-        params["task_type"] = "GPU"
+        param["task_type"] = "GPU"
 
     gbm = CatBoostClassifier(**param)
 
@@ -114,18 +114,7 @@ for train_index, test_index in skf.split(X, y):
     validate_pool = Pool(
         val_x, val_y, cat_features=categorical_features_indices)
 
-    params = {
-        'loss_function': 'MultiClass',
-        "classes_count": 5,
-        'depth': 8,                  # 木の深さ
-        'learning_rate': 0.02,       # 学習率
-        'early_stopping_rounds': 30,
-        'iterations': 10000,
-        'custom_loss': ['Accuracy'],
-        'random_seed': 42,
-        "verbose": True,
-        'task_type': "GPU",
-    }
+    params = trial.params
     # パラメータを指定した場合は、以下のようにインスタンスに適用させる
     model = CatBoostClassifier(**params)
     model.fit(train_pool, eval_set=validate_pool)

@@ -299,12 +299,11 @@ df_test = pd.concat(
 
 ## 学習データの期間を変更してみる
 ## 不均衡感をなくす
+## 学習データの期間を変更してみる
 df_train["datetime"] = df_train['general_firstup'].apply(lambda x: datetime.datetime.strptime(x, '%Y-%m-%d %H:%M:%S').date())
-df_train_2021 = df_train.query("fav_novel_cnt_bin == 0")[df_train["datetime"] > datetime.date(2021,1,1)].drop(columns=["datetime", "general_firstup"])
-df_train_1 = df_train.query("fav_novel_cnt_bin == 1").reset_index(drop=True)[df_train["datetime"] > datetime.date(2019,1,1)].drop(columns=["datetime", "general_firstup"])
-df_train_234 = df_train.query("fav_novel_cnt_bin != 0 & fav_novel_cnt_bin != 1").reset_index(drop=True).drop(columns=["datetime", "general_firstup"])
-df_train = pd.concat([df_train_2021, df_train_1, df_train_234]).reset_index(drop=True)
+df_train = df_train[df_train["datetime"] > datetime.date(2021,1,1)].drop(columns=["datetime", "general_firstup"])
 print(df_train.shape)
+
 
 ## 作成したデータを保存する
 os.makedirs(f"./{exp_num}/data", exist_ok=True)

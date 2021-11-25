@@ -50,12 +50,10 @@ for train_index, test_index in skf.split(X, y):
         "classes_count":5,
         'depth' : 8, # 木の深さ
         'learning_rate' : 0.02, # 学習率
-        'early_stopping_rounds':10,
+        'early_stopping_rounds':30,
         'iterations' : 5000, 
-        'custom_loss' :['Accuracy'], 
+        'custom_loss' :['Recall', "F1", "Precision"], 
         'random_seed' :42,
-        "l2_leaf_reg" : 50,
-        "border_count":64,
         "verbose":True,
         "task_type":"GPU"
     }

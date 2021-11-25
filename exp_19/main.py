@@ -47,17 +47,33 @@ def objective(trial):
     train_pool = Pool(train_x, train_y, cat_features=categorical_features_indices)
     validate_pool = Pool(valid_x, valid_y, cat_features=categorical_features_indices)
 
-    params = {
-        'iterations' : trial.suggest_int('iterations', 50, 300),                         
-        'depth' : trial.suggest_int('depth', 4, 10),                                       
-        'learning_rate' : trial.suggest_loguniform('learning_rate', 0.01, 0.3),               
-        'random_strength' :trial.suggest_int('random_strength', 0, 100),                       
-        'bagging_temperature' :trial.suggest_loguniform('bagging_temperature', 0.01, 100.00),
-        'learning_rate' :trial.suggest_loguniform('learning_rate', 1e-3, 1e-1),
-        'od_type': trial.suggest_categorical('od_type', ['IncToDec', 'Iter'])
+    param = {
+        'loss_function': 'MultiClass',
+        "colsample_bylevel": trial.suggest_float("colsample_bylevel", 0.01, 0.1),
+        "learning_rate": trial.suggest_uniform("learning_rate", 0.01, 0.1),
+        "iterations": trial.suggest_int("iterations", 1000, 5000),
+        "depth": trial.suggest_int("depth", 3, 12),
+        'random_strength': trial.suggest_uniform('random_strength',10,50),
+        "boosting_type": trial.suggest_categorical("boosting_type", ["Ordered", "Plain"]),
+        "bootstrap_type": trial.suggest_categorical(
+            "bootstrap_type", 
+            ["Bayesian", "Bernoulli","MVS"]
+            ),
+        # "subsample" : trial.suggest_float("subsample", 0.1, 1),
+        'custom_loss': ['Recall', "Precision", "F1"],
+        'random_seed': 42,
+        "verbose": True,
     }
 
-    gbm = CatBoostClassifier(loss_function='MultiClass',task_type= "GPU", l2_leaf_reg=50, **params)
+    if param["bootstrap_type"] == "Bayesian":
+        param["bagging_temperature"] = trial.suggest_float("bagging_temperature", 0, 100)
+    elif param["bootstrap_type"] == "Bernoulli":
+        param["subsample"] = trial.suggest_float("subsample", 0.1, 1)
+    
+    if GPU_ENABLED:
+        param["task_type"] = "GPU"
+
+    gbm = CatBoostClassifier(**param)
 
     gbm.fit(train_pool, eval_set=validate_pool, verbose=0, early_stopping_rounds=30)
 

@@ -16,10 +16,15 @@ from lightgbm import log_evaluation
 import matplotlib.pyplot as plt
 
 from sklearn.model_selection import StratifiedKFold
+from sklearn.metrics import log_loss
+from sklearn.model_selection import train_test_split
+
 from catboost import Pool
 from catboost import CatBoostClassifier
 from tqdm.auto import tqdm
 tqdm.pandas()
+
+
 
 exp_num = "exp_17"
 
@@ -31,6 +36,66 @@ sub_df = pd.read_csv('./data/sample_submission.csv')
 X = df_train.drop(columns="fav_novel_cnt_bin")
 y = df_train[["fav_novel_cnt_bin"]]
 
+GPU_ENABLED = True
+
+print("start tuning!")
+def objective(trial):
+    train_x, valid_x, train_y, valid_y = train_test_split(X,y, test_size=0.2)
+    # カテゴリのカラムのみを抽出
+    categorical_features_indices = np.where((X.dtypes != np.float32) & (X.dtypes != np.float64))[0]
+
+
+    # データセットの作成。Poolで説明変数、目的変数、
+    # カラムのデータ型を指定できる
+    train_pool = Pool(train_x, train_y, cat_features=categorical_features_indices)
+    validate_pool = Pool(valid_x, valid_y, cat_features=categorical_features_indices)
+
+    param = {
+        'loss_function': 'MultiClass',
+        "colsample_bylevel": trial.suggest_float("colsample_bylevel", 0.01, 0.1),
+        "learning_rate": trial.suggest_uniform("learning_rate", 0.01, 0.1),
+        "iterations": trial.suggest_int("iterations", 1000, 5000),
+        "depth": trial.suggest_int("depth", 3, 12),
+        'random_strength': trial.suggest_uniform('random_strength',10,50),
+        "boosting_type": trial.suggest_categorical("boosting_type", ["Ordered", "Plain"]),
+        "bootstrap_type": trial.suggest_categorical(
+            "bootstrap_type", ["Bayesian", "Bernoulli", "MVS"]
+        ),
+        'custom_loss': ['Recall', "Precision", "F1"],
+        'random_seed': 42,
+        "verbose": True,
+    }
+
+    if param["bootstrap_type"] == "Bayesian":
+        param["bagging_temperature"] = trial.suggest_float("bagging_temperature", 0, 100)
+    elif param["bootstrap_type"] == "Bernoulli":
+        param["subsample"] = trial.suggest_float("subsample", 0.1, 1)
+    
+    if GPU_ENABLED:
+        params["task_type"] = "GPU"
+
+    gbm = CatBoostClassifier(**param)
+
+    gbm.fit(train_pool, eval_set=validate_pool, verbose=0, early_stopping_rounds=30)
+
+    preds = gbm.predict_proba(valid_x)
+
+    multilog_loss = log_loss(valid_y, preds)
+    return multilog_loss
+
+study = optuna.create_study(direction="maximize")
+study.optimize(objective, n_trials=100, timeout=600)
+
+print("Number of finished trials: {}".format(len(study.trials)))
+
+print("Best trial:")
+trial = study.best_trial
+
+print("Value: {}".format(trial.value))
+print("finish optuna!")
+
+# CVを開始
+print("start cv")
 skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
 fold = 0
 print("start training")

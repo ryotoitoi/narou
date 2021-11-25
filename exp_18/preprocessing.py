@@ -277,7 +277,7 @@ test_label_df = le_df.iloc[40000:].reset_index(drop = True)
 df_train = pd.concat(
     [
     df_train[["general_firstup"]], # 目的変数
-    df_train_num, #.drop(columns = ['userid','end','isstop','isr15','isbl','isgl','iszankoku','istenni','pc_or_k']), 
+    df_train_num.drop(columns = ['userid','end','isstop','isr15','isbl','isgl','iszankoku','istenni','pc_or_k']), 
     train_title_df, train_story_df,train_keyword_df, #roberta系
     story_type_train, title_type_train, 
     train_label_df, #category変数
@@ -286,7 +286,7 @@ df_train = pd.concat(
     axis=1)
 df_test = pd.concat(
     [
-    df_test_num, #.drop(columns = ['userid','end','isstop','isr15','isbl','isgl','iszankoku','istenni','pc_or_k']), 
+    df_test_num.drop(columns = ['userid','end','isstop','isr15','isbl','isgl','iszankoku','istenni','pc_or_k']), 
     test_title_df, test_story_df,test_keyword_df, # roberta系
     story_type_test, title_type_test,
     test_label_df, # category変数

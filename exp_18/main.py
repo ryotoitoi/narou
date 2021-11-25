@@ -16,8 +16,8 @@ from lightgbm import log_evaluation
 import matplotlib.pyplot as plt
 
 from sklearn.model_selection import StratifiedKFold
-from catboost import Pool
-from catboost import CatBoostClassifier
+# from catboost import Pool
+# from catboost import CatBoostClassifier
 from tqdm.auto import tqdm
 tqdm.pandas()
 
@@ -39,38 +39,36 @@ for train_index, test_index in skf.split(X, y):
     train_x, val_x = X.iloc[train_index, :], X.iloc[test_index, :]
     train_y, val_y = y.iloc[train_index, :], y.iloc[test_index, :]
 
-    # カテゴリのカラムのみを抽出
-    categorical_features_indices = np.where((train_x.dtypes != np.float32) & (X.dtypes != np.float64))[0]
-
-    # データセットの作成。Poolで説明変数、目的変数、
-    # カラムのデータ型を指定できる
-    train_pool = Pool(train_x, train_y,
-                      cat_features=categorical_features_indices)
-    validate_pool = Pool(
-        val_x, val_y, cat_features=categorical_features_indices)
-
     params = {
-        'loss_function': 'MultiClass',
-        "classes_count": 5,
-        'depth': 8,                  # 木の深さ
-        'learning_rate': 0.02,       # 学習率
-        'early_stopping_rounds': 50,
-        'iterations': 10000,
-        'custom_loss': ['Accuracy'],
-        'random_seed': 42,
-        "verbose": True,
-        'task_type': "GPU",
+        'objective': 'multiclass',
+        'learning_rate':0.05, 
+        'num_iterations':500, 
+        'num_classes': 5,
+        "verbosity": -1,
+        'metric': 'multi_logloss',
+        "seed": 42
     }
-    # パラメータを指定した場合は、以下のようにインスタンスに適用させる
-    model = CatBoostClassifier(**params)
-    model.fit(train_pool, eval_set=validate_pool)
 
+    train_data = lgb.Dataset(train_x, label=train_y)
+    val_data = lgb.Dataset(val_x, label=val_y)
+
+    cat_cols = np.where((train_x.dtypes != np.float32) & (X.dtypes != np.float64))[0]
+
+    print("start training")
+    model = lgb.train(
+        params,
+        train_data, 
+        categorical_feature = cat_cols,
+        valid_names = ['train', 'valid'],
+        valid_sets =[train_data, val_data], 
+        callbacks=[early_stopping(10), log_evaluation(10)], 
+    )
     # 学習したモデルを保存する
     os.makedirs(f"{exp_num}/model", exist_ok=True)
     model_save_path = f'{exp_num}/model/model_fold{fold}.pkl'
     pickle.dump(model, open(model_save_path, 'wb'))
-
-    test_pred = model.predict_proba(df_test)
+    print("best_iteration == ", model.best_iteration)
+    test_pred = model.predict(df_test, num_iteration=model.best_iteration)
     sub_df.iloc[:, 1:] = test_pred
     os.makedirs(f"{exp_num}/output", exist_ok=True)
     sub_df.to_csv(f'{exp_num}/output/{exp_num}_fold{fold}.csv', index=False)
@@ -78,12 +76,10 @@ for train_index, test_index in skf.split(X, y):
 
 
 # Feature Importance
-feature_importance = model.get_feature_importance()
-fig = go.Figure()
-fig.add_trace(
-    go.Bar(x=feature_importance, y=list(X.columns), orientation="h")
-)
-fig.write_html("feature_importance.html")
+# feature importanceを表示
+importance = pd.DataFrame(model.feature_importance(importance_type='gain'), index=X.columns, columns=['importance'])
+importance = importance.sort_values('importance', ascending=False)
+print(importance)
 
 print("Finish Training.")
 sub_df = pd.DataFrame()

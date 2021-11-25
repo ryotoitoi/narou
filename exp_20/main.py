@@ -51,11 +51,11 @@ for train_index, test_index in skf.split(X, y):
         'depth' : 8,                  # 木の深さ
         'learning_rate' : 0.01,       # 学習率
         'early_stopping_rounds':10,
-        'iterations' : 1000, 
+        'iterations' : 5000, 
         'custom_loss' :['Accuracy'], 
         'random_seed' :42,
         "verbose":True,
-
+        "task_type":"GPU"
     }
     # パラメータを指定した場合は、以下のようにインスタンスに適用させる
     model = CatBoostClassifier(**params)

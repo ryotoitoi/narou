@@ -24,8 +24,6 @@ from catboost import CatBoostClassifier
 from tqdm.auto import tqdm
 tqdm.pandas()
 
-
-
 exp_num = "exp_19"
 
 # ファイル読み込み・データ確認
@@ -75,7 +73,7 @@ def objective(trial):
     if GPU_ENABLED:
         param["task_type"] = "GPU"
 
-    gbm = cb.CatBoostClassifier(**param)
+    gbm = CatBoostClassifier(**param)
 
     gbm.fit(train_pool, eval_set=validate_pool, verbose=0, early_stopping_rounds=30)
 

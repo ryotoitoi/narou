@@ -26,7 +26,7 @@ tqdm.pandas()
 
 
 
-exp_num = "exp_17"
+exp_num = "exp_19"
 
 # ファイル読み込み・データ確認
 

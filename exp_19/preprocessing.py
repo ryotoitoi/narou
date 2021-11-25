@@ -254,10 +254,6 @@ def create_type_features(texts):
 
     return type_df
 
-# TF-IDFのロード
-# train_story_tfidf = pd.read_pickle("./data/train_tfidf.pkl").reset_index(drop=True)
-# test_story_tfidf = pd.read_pickle("./data/test_tfidf.pkl").reset_index(drop=True)
-
 
 # 文字種ベースの特徴量を作成
 print("文字種ベースの特徴量を作成")

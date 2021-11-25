@@ -1,54 +1,40 @@
+# TF-IDFして次元圧縮をする
 import pandas as pd
 train = pd.read_pickle("./data/wakati_train.pkl")
 test = pd.read_pickle("./data/wakati_test.pkl")
-
 df = pd.concat([train, test])
-
-del train
-del test
-
+df.head()
 # TI-IDFを計算する
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import TruncatedSVD
-import numpy as np
+
+text_col = "story"
+for text_col in ["story", "title", "keyword"]:
+    print(f"Start {text_col}")
+    model = TfidfVectorizer()
+    tfidf = model.fit_transform(df[text_col + "_wakati"])
+    print(tfidf.shape)
+    # 次元圧縮
+    svd = TruncatedSVD(64)
+    svd.fit(tfidf)
+    tfidf_svd = svd.transform(tfidf)
+    print(tfidf_svd.shape)
+
+    tfidf_svd_train = tfidf_svd[:40000]
+    tfidf_svd_test = tfidf_svd[40000:]
+    train_df = pd.DataFrame(tfidf_svd_train)
+    test_df = pd.DataFrame(tfidf_svd_test)
+
+    for col_name in train_df.columns:
+        train_df = train_df.rename(
+            columns={col_name: f"tfidf_{text_col}_{col_name}"})
+
+    for col_name in test_df.columns:
+        test_df = test_df.rename(
+            columns={col_name: f"tfidf_{text_col}_{col_name}"})
+
+    train_df.to_csv(f"./tfidf/tfidf_{text_col}_train.csv", index = False)
+    test_df.to_csv(f"./tfidf/tfidf_{text_col}_test.csv", index = False)
 
 
-model = TfidfVectorizer()
-X = model.fit_transform(df["story_wakati"])
-story_tfidf= pd.DataFrame(data= X.toarray(), columns = model.get_feature_names())
-print(story_tfidf)
-print(story_tfidf.shape)
 
-# 次元圧縮
-print("次元圧縮を始めます！")
-svd = TruncatedSVD(64)
-svd.fit(story_tfidf)
-
-# batch処理
-nrow_one_loop = 1000
-nloop = np.floor(len(story_tfidf)/nrow_one_loop)
-min_idx = 0
-
-story_pos_dfs = []
-while min_idx < len(story_tfidf):
-    tmp_stories = story_tfidf[min_idx:min_idx+nrow_one_loop]
-    X = svd.transform(tmp_stories)
-    story_pos_dfs.append(pd.DataFrame(X))
-    min_idx += nrow_one_loop
-
-story_tfidf_svd = pd.concat(story_pos_dfs)
-del story_pos_dfs
-print(story_tfidf_svd.shape)
-
-story_tfidf_train  = pd.DataFrame(story_tfidf_svd[:40000])
-story_tfidf_test  = pd.DataFrame(story_tfidf_svd[40000:])
-for col_name in story_tfidf_train.columns:
-    story_tfidf_train = story_tfidf_train.rename(
-        columns={col_name: f"title_{col_name}"})
-
-for col_name in story_tfidf_test.columns:
-    story_tfidf_test = story_tfidf_test.rename(
-        columns={col_name: f"title_{col_name}"})
-
-print("train shape",story_tfidf_train.shape)
-print("test shape",story_tfidf_test.shape)

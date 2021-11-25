@@ -83,7 +83,7 @@ def objective(trial):
     return multilog_loss
 
 study = optuna.create_study(direction="minimize")
-study.optimize(objective, n_trials=100, timeout=6000)
+study.optimize(objective, n_trials=100)
 
 print("Number of finished trials: {}".format(len(study.trials)))
 

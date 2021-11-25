@@ -130,14 +130,6 @@ for train_index, test_index in skf.split(X, y):
     fold += 1
 
 
-# Feature Importance
-feature_importance = model.get_feature_importance()
-fig = go.Figure()
-fig.add_trace(
-    go.Bar(x=feature_importance, y=list(X.columns), orientation="h")
-)
-fig.write_html("feature_importance.html")
-
 print("Finish Training.")
 sub_df = pd.DataFrame()
 for i in range(10):

@@ -22,7 +22,7 @@ logger = getLogger(__name__)
 tqdm.pandas()
 
 # 実験数の設定
-exp_num = "exp_17"
+exp_num = "exp_19"
 
 emoji_json_path = "./emoji/emoji_ja.json"
 json_open = open(emoji_json_path)

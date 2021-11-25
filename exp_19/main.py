@@ -26,7 +26,7 @@ tqdm.pandas()
 
 
 
-exp_num = "exp_17"
+exp_num = "exp_19"
 
 # ファイル読み込み・データ確認
 
@@ -36,9 +36,8 @@ sub_df = pd.read_csv('./data/sample_submission.csv')
 X = df_train.drop(columns="fav_novel_cnt_bin")
 y = df_train[["fav_novel_cnt_bin"]]
 
-GPU_ENABLED = True
+GPU_ENABLED = False
 
-print("start tuning!")
 def objective(trial):
     train_x, valid_x, train_y, valid_y = train_test_split(X,y, test_size=0.2)
     # カテゴリのカラムのみを抽出
@@ -59,8 +58,10 @@ def objective(trial):
         'random_strength': trial.suggest_uniform('random_strength',10,50),
         "boosting_type": trial.suggest_categorical("boosting_type", ["Ordered", "Plain"]),
         "bootstrap_type": trial.suggest_categorical(
-            "bootstrap_type", ["Bayesian", "Bernoulli", "MVS"]
-        ),
+            "bootstrap_type", 
+            ["Bayesian", "Bernoulli","MVS"]
+            ),
+        # "subsample" : trial.suggest_float("subsample", 0.1, 1),
         'custom_loss': ['Recall', "Precision", "F1"],
         'random_seed': 42,
         "verbose": True,
@@ -72,9 +73,9 @@ def objective(trial):
         param["subsample"] = trial.suggest_float("subsample", 0.1, 1)
     
     if GPU_ENABLED:
-        params["task_type"] = "GPU"
+        param["task_type"] = "GPU"
 
-    gbm = CatBoostClassifier(**param)
+    gbm = cb.CatBoostClassifier(**param)
 
     gbm.fit(train_pool, eval_set=validate_pool, verbose=0, early_stopping_rounds=30)
 
@@ -84,7 +85,7 @@ def objective(trial):
     return multilog_loss
 
 study = optuna.create_study(direction="minimize")
-study.optimize(objective, n_trials=100, timeout=600)
+study.optimize(objective, n_trials=100, timeout=6000)
 
 print("Number of finished trials: {}".format(len(study.trials)))
 
@@ -92,7 +93,7 @@ print("Best trial:")
 trial = study.best_trial
 
 print("Value: {}".format(trial.value))
-print("finish optuna!")
+print("best params", trial.params)
 
 # CVを開始
 print("start cv")
@@ -114,18 +115,7 @@ for train_index, test_index in skf.split(X, y):
     validate_pool = Pool(
         val_x, val_y, cat_features=categorical_features_indices)
 
-    params = {
-        'loss_function': 'MultiClass',
-        "classes_count": 5,
-        'depth': 8,                  # 木の深さ
-        'learning_rate': 0.02,       # 学習率
-        'early_stopping_rounds': 30,
-        'iterations': 10000,
-        'custom_loss': ['Accuracy'],
-        'random_seed': 42,
-        "verbose": True,
-        'task_type': "GPU",
-    }
+    params = trial.params
     # パラメータを指定した場合は、以下のようにインスタンスに適用させる
     model = CatBoostClassifier(**params)
     model.fit(train_pool, eval_set=validate_pool)
